@@ -1,0 +1,3 @@
+ppi.sensors.benchmark.cli.impl.HoneycombMeshGeneratorImpl
+ppi.sensors.benchmark.cli.impl.SquareMeshGeneratorImpl
+ppi.sensors.benchmark.cli.impl.TriangleMeshGeneratorImpl

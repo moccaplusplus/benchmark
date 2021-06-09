@@ -7,10 +7,16 @@ import java.util.ServiceLoader;
 
 import static java.util.stream.Collectors.toList;
 
+/**
+ * Utility do pracy z serwisami filtrowanymi arbitralnej po nazwie.
+ *
+ *
+ * @see ServiceName
+ */
 public class NamedServiceLoader {
 
     public static <T> List<String> getNamesForType(Class<T> baseClass) {
-        return ServiceLoader.load(baseClass).stream()
+        return ServiceLoader.load(baseClass, NamedServiceLoader.class.getClassLoader()).stream()
                 .map(ServiceLoader.Provider::type)
                 .map(NamedServiceLoader::getServiceName)
                 .filter(Objects::nonNull)
@@ -18,12 +24,12 @@ public class NamedServiceLoader {
     }
 
     public static <T> boolean hasNamedService(Class<T> baseClass, String requestedName) {
-        return ServiceLoader.load(baseClass).stream()
+        return ServiceLoader.load(baseClass, NamedServiceLoader.class.getClassLoader()).stream()
                 .anyMatch(s -> hasServiceName(s.type(), requestedName));
     }
 
     public static <T> T loadNamedService(Class<T> baseClass, String requestedName) {
-        return ServiceLoader.load(baseClass)
+        return ServiceLoader.load(baseClass, NamedServiceLoader.class.getClassLoader())
                 .stream()
                 .filter(s -> hasServiceName(s.type(), requestedName))
                 .map(ServiceLoader.Provider::get)

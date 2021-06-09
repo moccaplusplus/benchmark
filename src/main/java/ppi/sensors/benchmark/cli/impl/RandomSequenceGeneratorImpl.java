@@ -1,6 +1,6 @@
-package ppi.sensors.benchmark.cli.ext.impl;
+package ppi.sensors.benchmark.cli.impl;
 
-import ppi.sensors.benchmark.cli.ext.PointSequenceGenerator;
+import ppi.sensors.benchmark.cli.PointSequenceGenerator;
 import ppi.sensors.benchmark.cli.model.Point;
 import ppi.sensors.benchmark.cli.util.ServiceName;
 
@@ -14,7 +14,7 @@ import static java.util.stream.Stream.generate;
 @ServiceName("random")
 public class RandomSequenceGeneratorImpl implements PointSequenceGenerator {
 
-    private final Random random;
+    protected final Random random;
 
     public RandomSequenceGeneratorImpl() {
         random = new Random();
@@ -27,6 +27,10 @@ public class RandomSequenceGeneratorImpl implements PointSequenceGenerator {
     }
 
     public Point nextPoint(int sideLength) {
-        return new Point(random.nextDouble() * sideLength, random.nextDouble() * sideLength);
+        return new Point(nextDouble() * sideLength, nextDouble() * sideLength);
+    }
+
+    protected double nextDouble() {
+        return random.nextDouble();
     }
 }

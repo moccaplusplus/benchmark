@@ -1,32 +1,296 @@
 package ppi.sensors.benchmark.cli;
 
 import picocli.CommandLine;
-import picocli.CommandLine.PicocliException;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
+import picocli.CommandLine.ParameterException;
+import picocli.CommandLine.ParseResult;
+import ppi.sensors.benchmark.cli.util.ValidationException;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.concurrent.Callable;
 
-import static ppi.sensors.benchmark.cli.util.ValidationUtil.validate;
+import static java.lang.System.err;
+import static java.lang.System.out;
+import static java.text.MessageFormat.format;
+import static ppi.sensors.benchmark.cli.util.NamedServiceLoader.getNamesForType;
+import static ppi.sensors.benchmark.cli.util.NamedServiceLoader.hasNamedService;
+import static ppi.sensors.benchmark.cli.util.NamedServiceLoader.loadNamedService;
 
-public class Cli {
+/**
+ * Główna klasa programu (z metodą main, ustawiona jak main-class w pliku MANIFEST.MF).
+ * Parsuje parametry z linii poleceń, a następnie je waliduje.
+ * Jeśli są poprawne to tworzy objekt {@link Generator}'a.
+ * Odpowiednio go konfiguruje i odpala metodę {@link Generator#generate()}.
+ */
+@Command(sortOptions = false, resourceBundle = "ppi.sensors.benchmark.cli.OptionMessages")
+public class Cli implements Callable<Integer> {
 
-    public static void main(String... args) throws IOException {
+    /**
+     * Nazwa subkatalogu, w którym zostaną zapisane wygenerowane pliki z rozmieszczeniem POI.
+     */
+    private static final String DIR_NAME_POI = "poi";
 
-        final var options = new Options();
-        final var commandLine = new CommandLine(options);
+    /**
+     * Nazwa subkatalogu, w którym zostaną zapisane wygenerowane pliki z rozmieszczeniem sensorów.
+     */
+    private static final String DIR_NAME_SENSOR = "sensor";
 
-        try {
-            commandLine.parseArgs(args);
-            if (options.help) {
-                commandLine.usage(System.out);
-                return;
-            }
-            validate(options);
-        } catch (PicocliException | IllegalArgumentException e) {
-            System.err.println(e.getMessage());
-            commandLine.usage(System.out);
-            System.exit(1);
+    /**
+     *
+     */
+    private static final int MAX_INSTANCE_COUNT = 100;
+
+    /**
+     *
+     */
+    private static final int MIN_INSTANCE_COUNT = 1;
+
+    /**
+     *
+     */
+    private static final int MAX_SIDE_LENGTH = 1000;
+
+    /**
+     *
+     */
+    private static final int MIN_SIDE_LENGTH = 1;
+
+    /**
+     *
+     */
+    private static final double MAX_POI_DISTANCE_TO_SIDE_LENGTH = 0.1;
+
+    /**
+     *
+     */
+    private static final double MIN_POI_DISTANCE_TO_SIDE_LENGTH = 0.001;
+
+    /**
+     *
+     */
+    private static final int MAX_SENSOR_COUNT = 10000;
+
+    /**
+     *
+     */
+    private static final int MIN_SENSOR_COUNT = 1;
+
+    /**
+     *
+     */
+    private static final int MAX_POI_EXCLUSION_CHANCE = 100;
+
+    /**
+     *
+     */
+    private static final int MIN_POI_EXCLUSION_CHANCE = 0;
+
+    /**
+     * Zestaw message'y dla komunikatów błędu.
+     */
+    private static final ResourceBundle MESSAGES = ResourceBundle.getBundle("ppi.sensors.benchmark.cli.ErrorMessages");
+
+    /**
+     * Pole do którego jest parsowana wartość parametru "-i", "--instanceCount".
+     */
+    @Option(names = {"-i", "--instanceCount"}, required = true, paramLabel = "<int>")
+    int instanceCount;
+
+    /**
+     * Pole do którego jest parsowana wartość parametru "-d", "--poiDistance".
+     */
+    @Option(names = {"-d", "--poiDistance"}, required = true, paramLabel = "<float>")
+    double poiDistance;
+
+    /**
+     * Pole do którego jest parsowana wartość parametru "-e", "--poiExclusion".
+     */
+    @Option(names = {"-e", "--poiExclusion"}, required = true, paramLabel = "<int>")
+    int poiExclusionChance;
+
+    /**
+     * Pole do którego jest parsowana wartość parametru "-m", "--poiMeshType".
+     */
+    @Option(names = {"-m", "--poiMeshType"}, required = true, paramLabel = "<string>")
+    String poiMeshType;
+
+    /**
+     * Represents {"-s", "--sensorCount"} parameter value after commandline
+     * arguments are parsed.
+     * Meaning: Number of sensors to be generated.
+     */
+    @Option(names = {"-s", "--sensorCount"}, required = true, paramLabel = "<int>")
+    int sensorCount;
+
+    /**
+     * Represents {"-g", "--generatorType"} parameter value after commandline
+     * arguments are parsed.
+     * Meaning: Type of generator used for generating sensor positions.
+     */
+    @Option(names = {"-g", "--generatorType"}, required = true, paramLabel = "<string>")
+    String sensorSequenceType;
+
+    /**
+     *
+     */
+    @Option(names = {"-l", "--sideLength"}, required = true, paramLabel = "<int>")
+    int sideLength;
+
+    /**
+     *
+     */
+    @Option(names = {"-o", "--outDir"}, paramLabel = "<file>")
+    String outDir = "./target";
+
+    /**
+     *
+     */
+    @Option(names = {"-h", "--help"}, usageHelp = true)
+    boolean help;
+
+    /**
+     * Entry point do programu.
+     * Parsuje argumenty przy użyciu biblioteki Picocli, nastepnie tworzy instancje {@link Cli}
+     * i wywoluje na niej metodę {@link #call()} (robi to obiekt {@link CommandLine} z biblioteki
+     * Picocli).
+     *
+     * @param args argumenty z linii poleceń.
+     */
+    public static void main(String... args) {
+        System.exit(new CommandLine(new Cli())
+                .setParameterExceptionHandler(Cli::parameterExceptionHandler)
+                .setExecutionExceptionHandler(Cli::executionExceptionHandler)
+                .execute(args));
+    }
+
+    /**
+     * Exception handler dla exceptionow wyrzuconych w trakcie parsowania argumentów
+     * z linii poleceń przez bibliotekę Picocli.
+     *
+     * @param e exception wyrzucony w trakcie parsowania argumentów.
+     * @param args argumenty przekazane do parsowania.
+     * @return kod zakończenia programu.
+     */
+    private static int parameterExceptionHandler(ParameterException e, String[] args) {
+        err.println(e.getMessage());
+        e.getCommandLine().usage(out);
+        return 1;
+    }
+
+    /**
+     * Exception handler dla exceptionow wyrzuconych w trakcie wykonywania programu
+     * przez bibliotekę Picocli. (tj. w trakcie wywolania metody {@link Callable#call()}
+     * z obiektu przekazanego do kontruktora {@link CommandLine}.
+     *
+     * @param e nieobslużony exception wyrzucany w trakcie wykonania programu.
+     * @param commandLine aktualny obiekt {@link CommandLine}.
+     * @param parseResult wynik parsowania.
+     * @return kod zakończenia programu.
+     */
+    private static int executionExceptionHandler(Exception e, CommandLine commandLine, ParseResult parseResult) {
+        if (e instanceof ValidationException) {
+            err.println(e.getMessage());
+            commandLine.usage(out);
+        } else {
+            e.printStackTrace(err);
         }
+        return 1;
+    }
 
-        new Generator(options).generate();
+    private static String msg(String key, Object... params) {
+        return format(MESSAGES.getString(key), params);
+    }
+
+    /**
+     * Główny "punkt wejścia" do programu commandline'owego.
+     * Wyłowywany automatycznie przez obiekt {@link CommandLine} po sparsowaniu przekazanych
+     * argumentów do pól obiektu {@link Cli}.
+     * Odpala {@link Generator} po uprzedniej walidacji pól i setupie generatora zgodnie z
+     * argumentami commandline.
+     *
+     * @return kod zakończenia programu.
+     * @throws IOException w przypadku problemów z zapisem plików lub utworzeniem katalogu.
+     * @throws ValidationException w przypadku gdy argumenty commandline nie spełniły kryteriów
+     * walidacyjnych.
+     */
+    @Override
+    public Integer call() throws IOException, ValidationException {
+        validate();
+        generate();
+        return 0;
+    }
+
+    /**
+     * Tworzy obiekt {@link Generator}'a, konfiguruje go zgodnie z wartościami pól odczytanych
+     * z argumentów commandline, a następnie startuje proces generowania plików (poprzez
+     * odpalenie metedy {@link Generator#generate()}).
+     *
+     * @throws IOException w przypadku problemów z zapisem plików lub utworzeniem katalogu.
+     */
+    private void generate() throws IOException {
+        final Generator generator = new Generator();
+
+        generator.setInstanceCount(instanceCount);
+        generator.setSideLength(sideLength);
+        generator.setPoiDensity(1.0 - poiExclusionChance / 100.0);
+        generator.setPoiDistance(poiDistance);
+        generator.setSensorCount(sensorCount);
+        generator.setPointMeshGenerator(loadNamedService(PointMeshGenerator.class, poiMeshType));
+        generator.setPointSequenceGenerator(loadNamedService(PointSequenceGenerator.class, sensorSequenceType));
+
+        final String normalizedOut = Paths.get(outDir).toAbsolutePath().normalize().toString();
+        final String subDirName = (poiMeshType + "_" + sensorSequenceType + "_" + sideLength).toLowerCase();
+        generator.setPoiOutPath(Paths.get(normalizedOut, DIR_NAME_POI, subDirName));
+        generator.setSensorOutPath(Paths.get(normalizedOut, DIR_NAME_SENSOR, subDirName));
+
+        generator.generate();
+    }
+
+    /**
+     * Sprawdza wartości pól obiekt {@link Cli} pod kątem zgodności z kryteriami walidacyjnymi.
+     *
+     * @throws ValidationException gdy któreś z pól nie spełnia kryteriów walidacyjnych.
+     */
+    private void validate() throws ValidationException {
+        final List<String> errors = new ArrayList<>();
+
+        if (instanceCount < MIN_INSTANCE_COUNT || instanceCount > MAX_INSTANCE_COUNT)
+            errors.add(msg("error.instanceCount", instanceCount,
+                    MIN_INSTANCE_COUNT, MAX_INSTANCE_COUNT));
+
+        if (sideLength < MIN_SIDE_LENGTH || sideLength > MAX_SIDE_LENGTH)
+            errors.add(msg("error.sideLength", sideLength, MIN_SIDE_LENGTH, MAX_SIDE_LENGTH));
+
+        final double minPoiDistance = MIN_POI_DISTANCE_TO_SIDE_LENGTH * sideLength;
+        final double maxPoiDistance = MAX_POI_DISTANCE_TO_SIDE_LENGTH * sideLength;
+        if (poiDistance < minPoiDistance || poiDistance > maxPoiDistance)
+            errors.add(msg("error.poiDistance", poiDistance, minPoiDistance, maxPoiDistance,
+                    sideLength, MIN_POI_DISTANCE_TO_SIDE_LENGTH, MAX_POI_DISTANCE_TO_SIDE_LENGTH));
+
+        if (poiExclusionChance < MIN_POI_EXCLUSION_CHANCE || poiExclusionChance > MAX_POI_EXCLUSION_CHANCE)
+            errors.add(msg("error.poiExclusionChance", poiExclusionChance,
+                    MIN_POI_EXCLUSION_CHANCE, MAX_POI_EXCLUSION_CHANCE));
+
+        if (poiMeshType == null || !hasNamedService(PointMeshGenerator.class, poiMeshType))
+            errors.add(msg("error.poiMeshType", poiMeshType, getNamesForType(PointMeshGenerator.class)));
+
+        if (sensorCount < MIN_SENSOR_COUNT || sensorCount > MAX_SENSOR_COUNT)
+            errors.add(msg("error.sensorCount", sensorCount, MIN_SENSOR_COUNT, MAX_SENSOR_COUNT));
+
+        if (sensorSequenceType == null || !hasNamedService(PointSequenceGenerator.class, sensorSequenceType))
+            errors.add(msg("error.sensorSequenceType", sensorSequenceType, getNamesForType(PointSequenceGenerator.class)));
+
+        final Path outPath = Paths.get(outDir);
+        if (!Files.exists(outPath) || !Files.isDirectory(outPath))
+            errors.add(msg("error.outDir", outDir));
+
+        if (errors.size() > 0) throw new ValidationException(String.join("\n", errors));
     }
 }

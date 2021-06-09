@@ -1,0 +1,3 @@
+ppi.sensors.benchmark.cli.impl.GaussianSequenceGeneratorImpl
+ppi.sensors.benchmark.cli.impl.HaltonSequenceGeneratorImpl
+ppi.sensors.benchmark.cli.impl.RandomSequenceGeneratorImpl
