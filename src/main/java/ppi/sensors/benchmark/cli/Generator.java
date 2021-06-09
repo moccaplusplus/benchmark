@@ -83,7 +83,8 @@ public class Generator {
     private PointSequenceGenerator pointSequenceGenerator;
 
     /**
-     * Instancja {@link JsonMapper}'a - używana do dumpowania obiektów na format JSON.
+     * Instancja {@link JsonMapper}'a z biblioteki Jackson.
+     * Używana do dumpowania obiektów na format JSON.
      */
     private final JsonMapper jsonMapper;
 

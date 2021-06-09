@@ -23,7 +23,7 @@ public class PoiData {
     public long seed;
 
     /**
-     *
+     * Gęstość siatki - czyli prawdopodobieństwo, że punkt nie zostanie wykluczony.
      */
     @JsonProperty
     public double density;

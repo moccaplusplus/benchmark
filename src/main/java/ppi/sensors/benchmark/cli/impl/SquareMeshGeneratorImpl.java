@@ -13,6 +13,13 @@ import java.util.List;
 @ServiceName("square")
 public class SquareMeshGeneratorImpl implements PointMeshGenerator {
 
+    /**
+     * Zwraca listę punktów tworzących siatkę opartą na kwadratach.
+     *
+     * @param distance odległość pomiędzy node'ami siatki - długość boku kwadratu bazowego siatki.
+     * @param sideLength długość boku kwadratowego obszaru, w którym znajdują się punkty.
+     * @return lista punktów tworzących siatkę.
+     */
     @Override
     public List<Point> createMesh(double distance, int sideLength) {
         final List<Point> result = new ArrayList<>();

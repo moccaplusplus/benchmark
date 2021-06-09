@@ -35,122 +35,145 @@ public class Cli implements Callable<Integer> {
     /**
      * Nazwa subkatalogu, w którym zostaną zapisane wygenerowane pliki z rozmieszczeniem POI.
      */
-    private static final String DIR_NAME_POI = "poi";
+    public static final String DIR_NAME_POI = "poi";
 
     /**
      * Nazwa subkatalogu, w którym zostaną zapisane wygenerowane pliki z rozmieszczeniem sensorów.
      */
-    private static final String DIR_NAME_SENSOR = "sensor";
+    public static final String DIR_NAME_SENSOR = "sensor";
 
     /**
-     *
+     * Wartość maksymalna dla {@link #instanceCount}.
+     * Używane podczas walidacji w {@link #validate()}.
      */
-    private static final int MAX_INSTANCE_COUNT = 100;
+    public static final int MAX_INSTANCE_COUNT = 100;
 
     /**
-     *
+     * Wartość minimalna dla {@link #instanceCount}.
+     * Używane podczas walidacji w {@link #validate()}.
      */
-    private static final int MIN_INSTANCE_COUNT = 1;
+    public static final int MIN_INSTANCE_COUNT = 1;
 
     /**
-     *
+     * Wartość maksymalna dla {@link #sideLength}.
+     * Używane podczas walidacji w {@link #validate()}.
      */
-    private static final int MAX_SIDE_LENGTH = 1000;
+    public static final int MAX_SIDE_LENGTH = 1000;
 
     /**
-     *
+     * Wartość minmalna dla {@link #sideLength}.
+     * Używane podczas walidacji w {@link #validate()}.
      */
-    private static final int MIN_SIDE_LENGTH = 1;
+    public static final int MIN_SIDE_LENGTH = 1;
 
     /**
-     *
+     * Wartość maksymalna dla {@link #poiDistance} w relacji do wartości {@link #sideLength}.
+     * Używane podczas walidacji w {@link #validate()}.
      */
-    private static final double MAX_POI_DISTANCE_TO_SIDE_LENGTH = 0.1;
+    public static final double MAX_POI_DISTANCE_TO_SIDE_LENGTH = 0.1;
 
     /**
-     *
+     * Wartość minmalna dla {@link #poiDistance} w relacji do wartości {@link #sideLength}.
+     * Używane podczas walidacji w {@link #validate()}.
      */
-    private static final double MIN_POI_DISTANCE_TO_SIDE_LENGTH = 0.001;
+    public static final double MIN_POI_DISTANCE_TO_SIDE_LENGTH = 0.001;
 
     /**
-     *
+     * Wartość maksymalna dla {@link #sensorCount}.
+     * Używane podczas walidacji w {@link #validate()}.
      */
-    private static final int MAX_SENSOR_COUNT = 10000;
+    public static final int MAX_SENSOR_COUNT = 10000;
 
     /**
-     *
+     * Wartość minmalna dla {@link #sensorCount}.
+     * Używane podczas walidacji w {@link #validate()}.
      */
-    private static final int MIN_SENSOR_COUNT = 1;
+    public static final int MIN_SENSOR_COUNT = 1;
 
     /**
-     *
+     * Wartość maksymalna dla {@link #poiExclusionChance}.
+     * Używane podczas walidacji w {@link #validate()}.
      */
-    private static final int MAX_POI_EXCLUSION_CHANCE = 100;
+    public static final int MAX_POI_EXCLUSION_CHANCE = 100;
 
     /**
-     *
+     * Wartość minmalna dla {@link #poiExclusionChance}.
+     * Używane podczas walidacji w {@link #validate()}.
      */
-    private static final int MIN_POI_EXCLUSION_CHANCE = 0;
+    public static final int MIN_POI_EXCLUSION_CHANCE = 0;
 
     /**
      * Zestaw message'y dla komunikatów błędu.
      */
-    private static final ResourceBundle MESSAGES = ResourceBundle.getBundle("ppi.sensors.benchmark.cli.ErrorMessages");
+    public static final ResourceBundle MESSAGES = ResourceBundle.getBundle("ppi.sensors.benchmark.cli.ErrorMessages");
 
     /**
-     * Pole do którego jest parsowana wartość parametru "-i", "--instanceCount".
+     * Pole do którego wczytywana jest wartość parametru  "-i", "--instanceCount".
+     * Znaczenie:
+     * Liczba instancji.
      */
     @Option(names = {"-i", "--instanceCount"}, required = true, paramLabel = "<int>")
     int instanceCount;
 
     /**
-     * Pole do którego jest parsowana wartość parametru "-d", "--poiDistance".
+     * Pole do którego wczytywana jest wartość parametru "-d", "--poiDistance".
+     * Znaczenie:
+     * Odległość między węzłami siatki.
      */
     @Option(names = {"-d", "--poiDistance"}, required = true, paramLabel = "<float>")
     double poiDistance;
 
     /**
-     * Pole do którego jest parsowana wartość parametru "-e", "--poiExclusion".
+     * Pole do którego wczytywana jest wartość parametru "-e", "--poiExclusion".
+     * Znaczenie:
+     * Prawdopodobieństwo wykluczenia POI w procentach.
+     * (Aby uniknąć regularności w rozkładzie POI, część losowo wybranych węzłówsiatki nie zawiera POI).
      */
     @Option(names = {"-e", "--poiExclusion"}, required = true, paramLabel = "<int>")
     int poiExclusionChance;
 
     /**
-     * Pole do którego jest parsowana wartość parametru "-m", "--poiMeshType".
+     * Pole do którego wczytywana jest wartość parametru "-m", "--poiMeshType".
+     * Znaczenie:
+     * Rodzaj siatki zawierającej punkty zainteresowania.
      */
     @Option(names = {"-m", "--poiMeshType"}, required = true, paramLabel = "<string>")
     String poiMeshType;
 
     /**
-     * Represents {"-s", "--sensorCount"} parameter value after commandline
-     * arguments are parsed.
-     * Meaning: Number of sensors to be generated.
+     * Pole do którego wczytywana jest wartość parametru "-s", "--sensorCount".
+     * Znaczenie:
+     * Liczba sensorów.
      */
     @Option(names = {"-s", "--sensorCount"}, required = true, paramLabel = "<int>")
     int sensorCount;
 
     /**
-     * Represents {"-g", "--generatorType"} parameter value after commandline
-     * arguments are parsed.
-     * Meaning: Type of generator used for generating sensor positions.
+     * Pole do którego wczytywana jest wartość parametru "-g", "--generatorType".
+     * Znaczenie:
+     * Rodzaj generatora dystrybucji sensorów.
      */
     @Option(names = {"-g", "--generatorType"}, required = true, paramLabel = "<string>")
     String sensorSequenceType;
 
     /**
-     *
+     * Pole do którego wczytywana jest wartość parametru "-l", "--sideLength".
+     * Znaczenie:
+     * Długość boku kwadratowego obszaru zawierającego punkty zainteresowania i sensory.
      */
     @Option(names = {"-l", "--sideLength"}, required = true, paramLabel = "<int>")
     int sideLength;
 
     /**
-     *
+     * Pole do którego wczytywana jest wartość parametru "-o", "--outDir".
+     * Znaczenie:
+     * Folder gdzie zapisać wyniki - domyślnie current working directory.
      */
     @Option(names = {"-o", "--outDir"}, paramLabel = "<file>")
     String outDir = "./target";
 
     /**
-     *
+     * Help command - obsługiwane wewnętrznie przez bibliotekę Picocli.
      */
     @Option(names = {"-h", "--help"}, usageHelp = true)
     boolean help;
