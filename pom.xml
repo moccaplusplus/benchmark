@@ -22,7 +22,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
                 <configuration>
-                    <release>11</release>
+                    <source>${maven.compiler.source}</source>
+                    <release>${maven.compiler.target}</release>
                 </configuration>
             </plugin>
             <plugin>
@@ -89,14 +90,6 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jlink-plugin</artifactId>
-                <version>3.1.0</version>
-                <configuration>
-                    <launcher>benchmark=ppi.sensors.benchmark.cli/ppi.sensors.benchmark.cli.Cli</launcher>
-                </configuration>
             </plugin>
         </plugins>
     </build>

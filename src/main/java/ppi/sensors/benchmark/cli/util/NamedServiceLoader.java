@@ -1,6 +1,7 @@
 package ppi.sensors.benchmark.cli.util;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.ServiceLoader;
@@ -8,14 +9,20 @@ import java.util.ServiceLoader;
 import static java.util.stream.Collectors.toList;
 
 /**
- * Utility do pracy z serwisami filtrowanymi arbitralnej po nazwie.
- *
+ * Utility do pracy z serwisami filtrowanymi po arbitralnej nazwie (nadanej
+ * przy użyciu anotacji {@link ServiceName}).
  *
  * @see ServiceName
  */
 public class NamedServiceLoader {
 
-    public static <T> List<String> getNamesForType(Class<T> baseClass) {
+    /**
+     * Zwraca listę nazw wszystkich zarejestrowanych implementacji danego interfejsu.
+     *
+     * @param baseClass klasa interfejsu serwisu.
+     * @return lista nazw wszystkich zarejestrowanych implementacji danego interfejsu.
+     */
+    public static List<String> getNamesForType(Class<?> baseClass) {
         return ServiceLoader.load(baseClass, NamedServiceLoader.class.getClassLoader()).stream()
                 .map(ServiceLoader.Provider::type)
                 .map(NamedServiceLoader::getServiceName)
@@ -23,11 +30,29 @@ public class NamedServiceLoader {
                 .collect(toList());
     }
 
-    public static <T> boolean hasNamedService(Class<T> baseClass, String requestedName) {
+    /**
+     * Sprawdza czy jest zarejstrowany serwis o podanej nazwie, implementujący podany interfejs.
+     *
+     * @param baseClass klasa interfejsu serwisu.
+     * @param requestedName sprawdzana nazwa.
+     * @return <code>true</code> jeśli jest zarejstrowany serwis o podanej nazwie,
+     * implementujący podany interfejs, <code>false</code> w przeciwnym przypadku.
+     */
+    public static boolean hasNamedService(Class<?> baseClass, String requestedName) {
         return ServiceLoader.load(baseClass, NamedServiceLoader.class.getClassLoader()).stream()
                 .anyMatch(s -> hasServiceName(s.type(), requestedName));
     }
 
+    /**
+     * Zwraca instancje serwisu o podanej nazwie, implementujący podany interfejs.
+     *
+     * @param baseClass klasa interfejsu serwisu.
+     * @param requestedName nazwa serwisu.
+     * @param <T> typ interfejsu serwisu.
+     * @return instancja serwisu o podanej nazwie, implementujący podany interfejs.
+     * @throws NoSuchElementException jeśli nie istnieje serwis o podanej nazwie,
+     * implementujący podany interfejs.
+     */
     public static <T> T loadNamedService(Class<T> baseClass, String requestedName) {
         return ServiceLoader.load(baseClass, NamedServiceLoader.class.getClassLoader())
                 .stream()
@@ -37,18 +62,40 @@ public class NamedServiceLoader {
                 .orElseThrow();
     }
 
-    public static <T> String getServiceName(Class<? extends T> actualClass) {
+    /**
+     * Zwraca nazwę serwisu (nadaną anotacją {@link ServiceName}) dla podanej klasy serwisu.
+     * Jest to w zasadzie util na pobranie nazwy z anotacji przypiętej do klasy serwisu.
+     *
+     * @param actualClass konkretna klasa serwisu (nie interfejsu bazowego).
+     * @return nazwa serwisu lub <code>null</code> jeśli dany serwis nie ma nazwy.
+     */
+    public static String getServiceName(Class<?> actualClass) {
         return Optional.of(actualClass)
                 .map(c -> c.getAnnotation(ServiceName.class))
                 .map(ServiceName::value)
                 .orElse(null);
     }
 
-    public static <T> String getServiceName(T instance) {
+    /**
+     * Zwraca nazwę serwisu (nadaną anotacją {@link ServiceName}) dla podanej instancji serwisu.
+     * Jest to w zasadzie util na pobranie nazwy z anotacji przypiętej do klasy serwisu.
+     *
+     * @param instance instancja serwisu.
+     * @return nazwa serwisu lub <code>null</code> jeśli dany serwis nie ma nazwy.
+     */
+    public static String getServiceName(Object instance) {
         return getServiceName(instance.getClass());
     }
 
-    public static <T> boolean hasServiceName(Class<? extends T> actualClass, String requestedName) {
+    /**
+     * Sprawdza czy dana klasa serwisu jest oznaczona podaną nazwą.
+     *
+     * @param actualClass konkretna klasa serwisu.
+     * @param requestedName sprawdzana nazwa.
+     * @return <code>true</code> jeśli dana klasa serwisu jest oznaczona podaną nazwą.
+     * <code>false</code> w przeciwnym wypadku.
+     */
+    public static boolean hasServiceName(Class<?> actualClass, String requestedName) {
         return Optional.of(actualClass)
                 .map(c -> c.getAnnotation(ServiceName.class))
                 .map(ServiceName::value)

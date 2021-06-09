@@ -125,54 +125,6 @@ public class Generator {
     }
 
     /**
-     * Generuje pliki z danymi dla rozmieszczenia POI (Point of Interest).
-     *
-     * @param outDir katalog w którym zapisane zostaną wygenerowane pliki.
-     * @throws IOException w przypadku gdy istnieje problem w zapisie do katalogu.
-     */
-    void generatePoiData(File outDir) throws IOException {
-
-        final Random random = new Random();
-
-        final PoiData data = new PoiData();
-        data.range = poiDistance;
-        data.name = getServiceName(pointMeshGenerator);
-        data.density = poiDensity;
-        data.xRange = data.yRange = sideLength;
-
-        final List<Point> mesh = pointMeshGenerator.createMesh(poiDistance, sideLength);
-
-        LOGGER.info("Generating POI data with params: side length = {}, instance count = {}, distance = {}, density = {}, mesh type = {}",
-                sideLength, instanceCount, data.range, data.density, data.name);
-
-        for (int i = 1; i <= instanceCount; i++) {
-            final File file = new File(outDir, i + ".json");
-            data.seed = Instant.now().toEpochMilli();
-            random.setSeed(data.seed);
-            data.pois = mesh.stream().filter(p -> random.nextDouble() < poiDensity).collect(toList());
-            jsonMapper.writeValue(file, data);
-            LOGGER.info("Generated file {}", file);
-        }
-    }
-
-    /**
-     * Generuje pliki z danymi dla rozmieszczenia sensorów.
-     *
-     * @param outDir katalog w którym zapisane zostaną wygenerowane pliki.
-     * @throws IOException w przypadku gdy istnieje problem w zapisie do katalogu.
-     */
-    void generateSensorData(File outDir) throws IOException {
-        LOGGER.info("Generating sensor data with params: side length = {}, instance count = {}, sensor count = {}, generator type = {}",
-                sideLength, instanceCount, sensorCount, getServiceName(pointSequenceGenerator));
-        for (int i = 1; i <= instanceCount; i++) {
-            final File file = new File(outDir, i + ".json");
-            final List<Point> data = pointSequenceGenerator.createSequence(sensorCount, sideLength);
-            jsonMapper.writeValue(file, data);
-            LOGGER.info("Generated file {}", file);
-        }
-    }
-
-    /**
      * Setter dla pola {@link #instanceCount}.
      *
      * @param instanceCount Liczba instancji - czyli liczba wygenerowanych plików.
@@ -257,5 +209,53 @@ public class Generator {
      */
     public void setPointSequenceGenerator(PointSequenceGenerator pointSequenceGenerator) {
         this.pointSequenceGenerator = pointSequenceGenerator;
+    }
+
+    /**
+     * Generuje pliki z danymi dla rozmieszczenia POI (Point of Interest).
+     *
+     * @param outDir katalog w którym zapisane zostaną wygenerowane pliki.
+     * @throws IOException w przypadku gdy istnieje problem w zapisie do katalogu.
+     */
+    /* visible for tests */ void generatePoiData(File outDir) throws IOException {
+
+        final Random random = new Random();
+
+        final PoiData data = new PoiData();
+        data.range = poiDistance;
+        data.name = getServiceName(pointMeshGenerator);
+        data.density = poiDensity;
+        data.xRange = data.yRange = sideLength;
+
+        final List<Point> mesh = pointMeshGenerator.createMesh(poiDistance, sideLength);
+
+        LOGGER.info("Generating POI data with params: side length = {}, instance count = {}, distance = {}, density = {}, mesh type = {}",
+                sideLength, instanceCount, data.range, data.density, data.name);
+
+        for (int i = 1; i <= instanceCount; i++) {
+            final File file = new File(outDir, i + ".json");
+            data.seed = Instant.now().toEpochMilli();
+            random.setSeed(data.seed);
+            data.pois = mesh.stream().filter(p -> random.nextDouble() < poiDensity).collect(toList());
+            jsonMapper.writeValue(file, data);
+            LOGGER.info("Generated file {}", file);
+        }
+    }
+
+    /**
+     * Generuje pliki z danymi dla rozmieszczenia sensorów.
+     *
+     * @param outDir katalog w którym zapisane zostaną wygenerowane pliki.
+     * @throws IOException w przypadku gdy istnieje problem w zapisie do katalogu.
+     */
+    /* visible for tests */ void generateSensorData(File outDir) throws IOException {
+        LOGGER.info("Generating sensor data with params: side length = {}, instance count = {}, sensor count = {}, generator type = {}",
+                sideLength, instanceCount, sensorCount, getServiceName(pointSequenceGenerator));
+        for (int i = 1; i <= instanceCount; i++) {
+            final File file = new File(outDir, i + ".json");
+            final List<Point> data = pointSequenceGenerator.createSequence(sensorCount, sideLength);
+            jsonMapper.writeValue(file, data);
+            LOGGER.info("Generated file {}", file);
+        }
     }
 }

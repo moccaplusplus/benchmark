@@ -113,7 +113,7 @@ public class Cli implements Callable<Integer> {
      * Liczba instancji.
      */
     @Option(names = {"-i", "--instanceCount"}, required = true, paramLabel = "<int>")
-    int instanceCount;
+    /* visible for tests */ int instanceCount;
 
     /**
      * Pole do którego wczytywana jest wartość parametru "-d", "--poiDistance".
@@ -121,7 +121,7 @@ public class Cli implements Callable<Integer> {
      * Odległość między węzłami siatki.
      */
     @Option(names = {"-d", "--poiDistance"}, required = true, paramLabel = "<float>")
-    double poiDistance;
+    /* visible for tests */ double poiDistance;
 
     /**
      * Pole do którego wczytywana jest wartość parametru "-e", "--poiExclusion".
@@ -130,7 +130,7 @@ public class Cli implements Callable<Integer> {
      * (Aby uniknąć regularności w rozkładzie POI, część losowo wybranych węzłówsiatki nie zawiera POI).
      */
     @Option(names = {"-e", "--poiExclusion"}, required = true, paramLabel = "<int>")
-    int poiExclusionChance;
+    /* visible for tests */ int poiExclusionChance;
 
     /**
      * Pole do którego wczytywana jest wartość parametru "-m", "--poiMeshType".
@@ -138,7 +138,7 @@ public class Cli implements Callable<Integer> {
      * Rodzaj siatki zawierającej punkty zainteresowania.
      */
     @Option(names = {"-m", "--poiMeshType"}, required = true, paramLabel = "<string>")
-    String poiMeshType;
+    /* visible for tests */ String poiMeshType;
 
     /**
      * Pole do którego wczytywana jest wartość parametru "-s", "--sensorCount".
@@ -146,7 +146,7 @@ public class Cli implements Callable<Integer> {
      * Liczba sensorów.
      */
     @Option(names = {"-s", "--sensorCount"}, required = true, paramLabel = "<int>")
-    int sensorCount;
+    /* visible for tests */ int sensorCount;
 
     /**
      * Pole do którego wczytywana jest wartość parametru "-g", "--generatorType".
@@ -154,7 +154,7 @@ public class Cli implements Callable<Integer> {
      * Rodzaj generatora dystrybucji sensorów.
      */
     @Option(names = {"-g", "--generatorType"}, required = true, paramLabel = "<string>")
-    String sensorSequenceType;
+    /* visible for tests */ String sensorSequenceType;
 
     /**
      * Pole do którego wczytywana jest wartość parametru "-l", "--sideLength".
@@ -162,7 +162,7 @@ public class Cli implements Callable<Integer> {
      * Długość boku kwadratowego obszaru zawierającego punkty zainteresowania i sensory.
      */
     @Option(names = {"-l", "--sideLength"}, required = true, paramLabel = "<int>")
-    int sideLength;
+    /* visible for tests */ int sideLength;
 
     /**
      * Pole do którego wczytywana jest wartość parametru "-o", "--outDir".
@@ -170,13 +170,13 @@ public class Cli implements Callable<Integer> {
      * Folder gdzie zapisać wyniki - domyślnie current working directory.
      */
     @Option(names = {"-o", "--outDir"}, paramLabel = "<file>")
-    String outDir = "./target";
+    /* visible for tests */ String outDir = "./target";
 
     /**
      * Help command - obsługiwane wewnętrznie przez bibliotekę Picocli.
      */
     @Option(names = {"-h", "--help"}, usageHelp = true)
-    boolean help;
+    /* visible for tests */ boolean help;
 
     /**
      * Entry point do programu.
@@ -227,7 +227,15 @@ public class Cli implements Callable<Integer> {
         return 1;
     }
 
-    private static String msg(String key, Object... params) {
+    /**
+     * Używana wewnętrznie.
+     * Utility do wygodnego wyciągania message'y z resource bundle'a oraz formatowania z parametrami.
+     *
+     * @param key klucz message'a.
+     * @param params parametry do podmiany (zakładając,że dany message wymaga parametrów).
+     * @return sformatowany i zlokalizowany tekst message'a.
+     */
+    /* visible for tests */ static String msg(String key, Object... params) {
         return format(MESSAGES.getString(key), params);
     }
 
@@ -257,7 +265,7 @@ public class Cli implements Callable<Integer> {
      *
      * @throws IOException w przypadku problemów z zapisem plików lub utworzeniem katalogu.
      */
-    private void generate() throws IOException {
+    /* visible for tests */ void generate() throws IOException {
         final Generator generator = new Generator();
 
         generator.setInstanceCount(instanceCount);
@@ -281,7 +289,7 @@ public class Cli implements Callable<Integer> {
      *
      * @throws ValidationException gdy któreś z pól nie spełnia kryteriów walidacyjnych.
      */
-    private void validate() throws ValidationException {
+    /* visible for tests */ void validate() throws ValidationException {
         final List<String> errors = new ArrayList<>();
 
         if (instanceCount < MIN_INSTANCE_COUNT || instanceCount > MAX_INSTANCE_COUNT)

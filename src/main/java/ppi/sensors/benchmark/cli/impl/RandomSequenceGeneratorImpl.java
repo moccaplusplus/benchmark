@@ -23,9 +23,6 @@ public class RandomSequenceGeneratorImpl implements PointSequenceGenerator {
      */
     protected final Random random;
 
-    /**
-     * Domyślny konstruktor.
-     */
     public RandomSequenceGeneratorImpl() {
         random = new Random();
         random.setSeed(Instant.now().toEpochMilli());
