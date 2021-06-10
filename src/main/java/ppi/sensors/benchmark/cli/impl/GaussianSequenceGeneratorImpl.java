@@ -12,8 +12,24 @@ import ppi.sensors.benchmark.cli.util.ServiceName;
 public class GaussianSequenceGeneratorImpl extends RandomSequenceGeneratorImpl {
 
     /**
+     * Konstruktor z domyślnym ziarnem generatora losowego.
+     */
+    public GaussianSequenceGeneratorImpl() {
+        super();
+    }
+
+    /**
+     * Konstruktor z możliwością przekazania ziarna dla generatora losowego.
+     *
+     * @param seed ziarno dla generatora losowego.
+     */
+    public GaussianSequenceGeneratorImpl(long seed) {
+        super(seed);
+    }
+
+    /**
      * Zwraca nastepną liczbe pseudolosową, wg rozkładu Gaussa o średniej 1/2 sideLength
-     * i odchyleniu standardowym 1/2 * sideLength. Wartości spoza przedziału [0, sideLength]
+     * i odchyleniu standardowym 1/6 * sideLength. Wartości spoza przedziału [0, sideLength]
      * są "przycinane" do granic przedziału.
      *
      * @return następna liczba pseudolosowa wg rozkładu Gaussa.
@@ -22,8 +38,8 @@ public class GaussianSequenceGeneratorImpl extends RandomSequenceGeneratorImpl {
     @Override
     protected double nextDouble(int sideLength) {
         double d = random.nextGaussian();
-        if (d < -1) d = -1.0;
-        else if (d > 1) d = 1.0;
-        return sideLength * (d + 1.0) / 2.0 ;
+        if (d < -3) d = -3.0;
+        else if (d > 3) d = 3.0;
+        return sideLength * (d + 3.0) / 6.0 ;
     }
 }

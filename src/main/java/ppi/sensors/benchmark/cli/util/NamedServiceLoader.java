@@ -102,4 +102,10 @@ public class NamedServiceLoader {
                 .map(requestedName::equalsIgnoreCase)
                 .orElse(false);
     }
+
+    /**
+     * Prywatny konstruktor żeby uniemożliwić tworzenie instancji util'a,
+     * który ma wyłącznie statyczne metody.
+     */
+    private NamedServiceLoader() {}
 }

@@ -23,9 +23,21 @@ public class RandomSequenceGeneratorImpl implements PointSequenceGenerator {
      */
     protected final Random random;
 
+    /**
+     * Konstruktor z domyślnym ziarnem (current timestamp) generatora losowego.
+     */
     public RandomSequenceGeneratorImpl() {
+        this(Instant.now().toEpochMilli());
+    }
+
+    /**
+     * Konstruktor z możliwością przekazania ziarna dla generatora losowego.
+     *
+     * @param seed ziarno dla generatora losowego.
+     */
+    public RandomSequenceGeneratorImpl(long seed) {
         random = new Random();
-        random.setSeed(Instant.now().toEpochMilli());
+        random.setSeed(seed);
     }
 
     /**

@@ -47,7 +47,7 @@ public class HaltonSequenceGeneratorImpl implements PointSequenceGenerator {
      * @return Zwraca kolejny punkt (wg licznika {@link #counter})
      */
     public Point nextPoint(int sideLength) {
-        final int index = counter++;
+        final int index = ++counter;
         return new Point(
                 haltonNumber(index, 2) * sideLength,
                 haltonNumber(index, 3) * sideLength);

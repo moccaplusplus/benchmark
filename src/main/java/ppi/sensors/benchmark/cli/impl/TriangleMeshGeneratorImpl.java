@@ -22,11 +22,11 @@ public class TriangleMeshGeneratorImpl implements PointMeshGenerator {
      */
     @Override
     public List<Point> createMesh(double distance, int sideLength) {
-        final List<Point> result = new ArrayList<>();
-        final double h = distance * Math.sqrt(3) / 2;
-        boolean odd = false;
-        for (double y = 0.0; y <= sideLength; y += h, odd = !odd)
-            for (double x = odd ? distance / 2.0 : 0.0; x <= sideLength; x += distance)
+        final var result = new ArrayList<Point>();
+        final var h = distance * Math.sqrt(3) / 2;
+        var odd = false;
+        for (var y = 0.0; y <= sideLength; y += h, odd = !odd)
+            for (var x = odd ? distance / 2.0 : 0.0; x <= sideLength; x += distance)
                 result.add(new Point(x, y));
         return result;
     }

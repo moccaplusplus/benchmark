@@ -22,9 +22,9 @@ public class SquareMeshGeneratorImpl implements PointMeshGenerator {
      */
     @Override
     public List<Point> createMesh(double distance, int sideLength) {
-        final List<Point> result = new ArrayList<>();
-        for (double y = 0.0; y <= sideLength; y += distance)
-            for (double x = 0.0; x <= sideLength; x += distance)
+        final var result = new ArrayList<Point>();
+        for (var y = 0.0; y <= sideLength; y += distance)
+            for (var x = 0.0; x <= sideLength; x += distance)
                 result.add(new Point(x, y));
         return result;
     }

@@ -9,10 +9,8 @@ import ppi.sensors.benchmark.cli.util.ValidationException;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.Callable;
 
@@ -197,7 +195,7 @@ public class Cli implements Callable<Integer> {
      * Exception handler dla exceptionow wyrzuconych w trakcie parsowania argumentów
      * z linii poleceń przez bibliotekę Picocli.
      *
-     * @param e exception wyrzucony w trakcie parsowania argumentów.
+     * @param e    exception wyrzucony w trakcie parsowania argumentów.
      * @param args argumenty przekazane do parsowania.
      * @return kod zakończenia programu.
      */
@@ -212,7 +210,7 @@ public class Cli implements Callable<Integer> {
      * przez bibliotekę Picocli. (tj. w trakcie wywolania metody {@link Callable#call()}
      * z obiektu przekazanego do kontruktora {@link CommandLine}.
      *
-     * @param e nieobslużony exception wyrzucany w trakcie wykonania programu.
+     * @param e           nieobslużony exception wyrzucany w trakcie wykonania programu.
      * @param commandLine aktualny obiekt {@link CommandLine}.
      * @param parseResult wynik parsowania.
      * @return kod zakończenia programu.
@@ -231,11 +229,12 @@ public class Cli implements Callable<Integer> {
      * Używana wewnętrznie.
      * Utility do wygodnego wyciągania message'y z resource bundle'a oraz formatowania z parametrami.
      *
-     * @param key klucz message'a.
+     * @param key    klucz message'a.
      * @param params parametry do podmiany (zakładając,że dany message wymaga parametrów).
      * @return sformatowany i zlokalizowany tekst message'a.
      */
-    /* visible for tests */ static String msg(String key, Object... params) {
+    /* visible for tests */
+    static String msg(String key, Object... params) {
         return format(MESSAGES.getString(key), params);
     }
 
@@ -247,9 +246,9 @@ public class Cli implements Callable<Integer> {
      * argumentami commandline.
      *
      * @return kod zakończenia programu.
-     * @throws IOException w przypadku problemów z zapisem plików lub utworzeniem katalogu.
+     * @throws IOException         w przypadku problemów z zapisem plików lub utworzeniem katalogu.
      * @throws ValidationException w przypadku gdy argumenty commandline nie spełniły kryteriów
-     * walidacyjnych.
+     *                             walidacyjnych.
      */
     @Override
     public Integer call() throws IOException, ValidationException {
@@ -266,7 +265,7 @@ public class Cli implements Callable<Integer> {
      * @throws IOException w przypadku problemów z zapisem plików lub utworzeniem katalogu.
      */
     /* visible for tests */ void generate() throws IOException {
-        final Generator generator = new Generator();
+        final var generator = new Generator();
 
         generator.setInstanceCount(instanceCount);
         generator.setSideLength(sideLength);
@@ -276,8 +275,8 @@ public class Cli implements Callable<Integer> {
         generator.setPointMeshGenerator(loadNamedService(PointMeshGenerator.class, poiMeshType));
         generator.setPointSequenceGenerator(loadNamedService(PointSequenceGenerator.class, sensorSequenceType));
 
-        final String normalizedOut = Paths.get(outDir).toAbsolutePath().normalize().toString();
-        final String subDirName = (poiMeshType + "_" + sensorSequenceType + "_" + sideLength).toLowerCase();
+        final var normalizedOut = Paths.get(outDir).toAbsolutePath().normalize().toString();
+        final var subDirName = (poiMeshType + "_" + sensorSequenceType + "_" + sideLength).toLowerCase();
         generator.setPoiOutPath(Paths.get(normalizedOut, DIR_NAME_POI, subDirName));
         generator.setSensorOutPath(Paths.get(normalizedOut, DIR_NAME_SENSOR, subDirName));
 
@@ -285,12 +284,12 @@ public class Cli implements Callable<Integer> {
     }
 
     /**
-     * Sprawdza wartości pól obiekt {@link Cli} pod kątem zgodności z kryteriami walidacyjnymi.
+     * Sprawdza wartości pól obiektu {@link Cli} pod kątem zgodności z kryteriami walidacyjnymi.
      *
      * @throws ValidationException gdy któreś z pól nie spełnia kryteriów walidacyjnych.
      */
     /* visible for tests */ void validate() throws ValidationException {
-        final List<String> errors = new ArrayList<>();
+        final var errors = new ArrayList<String>();
 
         if (instanceCount < MIN_INSTANCE_COUNT || instanceCount > MAX_INSTANCE_COUNT)
             errors.add(msg("error.instanceCount", instanceCount,
@@ -299,8 +298,8 @@ public class Cli implements Callable<Integer> {
         if (sideLength < MIN_SIDE_LENGTH || sideLength > MAX_SIDE_LENGTH)
             errors.add(msg("error.sideLength", sideLength, MIN_SIDE_LENGTH, MAX_SIDE_LENGTH));
 
-        final double minPoiDistance = MIN_POI_DISTANCE_TO_SIDE_LENGTH * sideLength;
-        final double maxPoiDistance = MAX_POI_DISTANCE_TO_SIDE_LENGTH * sideLength;
+        final var minPoiDistance = MIN_POI_DISTANCE_TO_SIDE_LENGTH * sideLength;
+        final var maxPoiDistance = MAX_POI_DISTANCE_TO_SIDE_LENGTH * sideLength;
         if (poiDistance < minPoiDistance || poiDistance > maxPoiDistance)
             errors.add(msg("error.poiDistance", poiDistance, minPoiDistance, maxPoiDistance,
                     sideLength, MIN_POI_DISTANCE_TO_SIDE_LENGTH, MAX_POI_DISTANCE_TO_SIDE_LENGTH));
@@ -318,7 +317,7 @@ public class Cli implements Callable<Integer> {
         if (sensorSequenceType == null || !hasNamedService(PointSequenceGenerator.class, sensorSequenceType))
             errors.add(msg("error.sensorSequenceType", sensorSequenceType, getNamesForType(PointSequenceGenerator.class)));
 
-        final Path outPath = Paths.get(outDir);
+        final var outPath = Paths.get(outDir);
         if (!Files.exists(outPath) || !Files.isDirectory(outPath))
             errors.add(msg("error.outDir", outDir));
 
