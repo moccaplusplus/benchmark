@@ -27,7 +27,10 @@ import static ppi.sensors.benchmark.cli.util.NamedServiceLoader.loadNamedService
  * Jeśli są poprawne to tworzy objekt {@link Generator}'a.
  * Odpowiednio go konfiguruje i odpala metodę {@link Generator#generate()}.
  */
-@Command(sortOptions = false, resourceBundle = "ppi.sensors.benchmark.cli.OptionMessages")
+@Command(
+        name = "java -jar benchmark-cli.jar",
+        sortOptions = false,
+        resourceBundle = "ppi.sensors.benchmark.cli.OptionMessages")
 public class Cli implements Callable<Integer> {
 
     /**
@@ -168,7 +171,7 @@ public class Cli implements Callable<Integer> {
      * Folder gdzie zapisać wyniki - domyślnie current working directory.
      */
     @Option(names = {"-o", "--outDir"}, paramLabel = "<file>")
-    /* visible for tests */ String outDir = "./target";
+    /* visible for tests */ String outDir = ".";
 
     /**
      * Help command - obsługiwane wewnętrznie przez bibliotekę Picocli.

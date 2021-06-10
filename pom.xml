@@ -13,6 +13,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
+        <libs.classpath.dir>${project.build.directory}/libs</libs.classpath.dir>
     </properties>
 
     <build>
@@ -36,15 +37,7 @@
                             <mainClass>ppi.sensors.benchmark.cli.Cli</mainClass>
                         </manifest>
                     </archive>
-                    <finalName>benchmark-cli</finalName>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.3.0</version>
-                <configuration>
-                    <show>private</show>
+                    <outputDirectory>${libs.classpath.dir}</outputDirectory>
                 </configuration>
             </plugin>
             <plugin>
@@ -60,9 +53,7 @@
                         </goals>
                         <configuration>
                             <includeScope>runtime</includeScope>
-                            <outputDirectory>
-                                ${project.build.directory}/libs
-                            </outputDirectory>
+                            <outputDirectory>${libs.classpath.dir}</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
@@ -80,7 +71,9 @@
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
-                    <finalName>benchmark-cli</finalName>
+                    <attach>false</attach>
+                    <appendAssemblyId>false</appendAssemblyId>
+                    <finalName>${project.artifactId}</finalName>
                 </configuration>
                 <executions>
                     <execution>
@@ -91,6 +84,14 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.3.0</version>
+                <configuration>
+                    <show>private</show>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
