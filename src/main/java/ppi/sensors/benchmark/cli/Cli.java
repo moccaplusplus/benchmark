@@ -4,7 +4,6 @@ import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.ParameterException;
-import picocli.CommandLine.ParseResult;
 import ppi.sensors.benchmark.cli.util.ValidationException;
 
 import java.io.IOException;
@@ -12,9 +11,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
-import java.util.concurrent.Callable;
 
 import static java.lang.System.err;
+import static java.lang.System.exit;
 import static java.lang.System.out;
 import static java.text.MessageFormat.format;
 import static ppi.sensors.benchmark.cli.util.NamedServiceLoader.getNamesForType;
@@ -31,7 +30,7 @@ import static ppi.sensors.benchmark.cli.util.NamedServiceLoader.loadNamedService
         name = "java -jar benchmark-cli.jar",
         sortOptions = false,
         resourceBundle = "ppi.sensors.benchmark.cli.OptionMessages")
-public class Cli implements Callable<Integer> {
+public class Cli {
 
     /**
      * Nazwa subkatalogu, w którym zostaną zapisane wygenerowane pliki z rozmieszczeniem POI.
@@ -174,58 +173,42 @@ public class Cli implements Callable<Integer> {
     /* visible for tests */ String outDir = ".";
 
     /**
-     * Help command - obsługiwane wewnętrznie przez bibliotekę Picocli.
+     * Help command - opcja wyświetlenia pomocy.
      */
     @Option(names = {"-h", "--help"}, usageHelp = true)
     /* visible for tests */ boolean help;
 
     /**
      * Entry point do programu.
-     * Parsuje argumenty przy użyciu biblioteki Picocli, nastepnie tworzy instancje {@link Cli}
-     * i wywoluje na niej metodę {@link #call()} (robi to obiekt {@link CommandLine} z biblioteki
-     * Picocli).
+     * Parsuje argumenty przy użyciu biblioteki Picocli, a następnie tworzy instancje {@link Cli}
+     * i wywoluje na niej metodę {@link #run()}.
      *
      * @param args argumenty z linii poleceń.
      */
-    public static void main(String... args) {
-        System.exit(new CommandLine(new Cli())
-                .setParameterExceptionHandler(Cli::parameterExceptionHandler)
-                .setExecutionExceptionHandler(Cli::executionExceptionHandler)
-                .execute(args));
-    }
+    public static void main(String... args) throws IOException {
 
-    /**
-     * Exception handler dla exceptionow wyrzuconych w trakcie parsowania argumentów
-     * z linii poleceń przez bibliotekę Picocli.
-     *
-     * @param e    exception wyrzucony w trakcie parsowania argumentów.
-     * @param args argumenty przekazane do parsowania.
-     * @return kod zakończenia programu.
-     */
-    private static int parameterExceptionHandler(ParameterException e, String[] args) {
-        err.println(e.getClass().getName() + ": " + e.getMessage());
-        e.getCommandLine().usage(out);
-        return 1;
-    }
+        final var cli = new Cli();
+        final var commandLine = new CommandLine(cli);
 
-    /**
-     * Exception handler dla exceptionow wyrzuconych w trakcie wykonywania programu
-     * przez bibliotekę Picocli. (tj. w trakcie wywolania metody {@link Callable#call()}
-     * z obiektu przekazanego do kontruktora {@link CommandLine}.
-     *
-     * @param e           nieobslużony exception wyrzucany w trakcie wykonania programu.
-     * @param commandLine aktualny obiekt {@link CommandLine}.
-     * @param parseResult wynik parsowania.
-     * @return kod zakończenia programu.
-     */
-    private static int executionExceptionHandler(Exception e, CommandLine commandLine, ParseResult parseResult) {
-        if (e instanceof ValidationException) {
+        try {
+            commandLine.parseArgs(args);
+        } catch (ParameterException e) {
+            err.println(e.getClass().getName() + ": " + e.getMessage());
+            e.getCommandLine().usage(out);
+            exit(1);
+        }
+
+        if (cli.help) {
+            commandLine.usage(out);
+            exit(0);
+        }
+
+        try {
+            cli.run();
+        } catch (ValidationException e) {
             err.println(e.getMessage());
             commandLine.usage(out);
-        } else {
-            e.printStackTrace(err);
         }
-        return 1;
     }
 
     /**
@@ -242,22 +225,15 @@ public class Cli implements Callable<Integer> {
     }
 
     /**
-     * Główny "punkt wejścia" do programu commandline'owego.
-     * Wyłowywany automatycznie przez obiekt {@link CommandLine} po sparsowaniu przekazanych
-     * argumentów do pól obiektu {@link Cli}.
-     * Odpala {@link Generator} po uprzedniej walidacji pól i setupie generatora zgodnie z
-     * argumentami commandline.
+     * Wyłowywany w {@link #main(String...)} po sparsowaniu przekazanych argumentów do pól obiektu {@link Cli}.
+     * Odpala {@link Generator} po uprzedniej walidacji pól i setupie generatora zgodnie z argumentami commandline.
      *
-     * @return kod zakończenia programu.
-     * @throws IOException         w przypadku problemów z zapisem plików lub utworzeniem katalogu.
-     * @throws ValidationException w przypadku gdy argumenty commandline nie spełniły kryteriów
-     *                             walidacyjnych.
+     * @throws IOException w przypadku problemów z zapisem plików lub utworzeniem katalogu.
+     * @throws ValidationException w przypadku gdy argumenty commandline nie spełniły kryteriów walidacyjnych.
      */
-    @Override
-    public Integer call() throws IOException, ValidationException {
+    public void run() throws IOException, ValidationException {
         validate();
         generate();
-        return 0;
     }
 
     /**
