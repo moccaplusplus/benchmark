@@ -203,7 +203,7 @@ public class Cli implements Callable<Integer> {
      * @return kod zakończenia programu.
      */
     private static int parameterExceptionHandler(ParameterException e, String[] args) {
-        err.println(e.getMessage());
+        err.println(e.getClass().getName() + ": " + e.getMessage());
         e.getCommandLine().usage(out);
         return 1;
     }
