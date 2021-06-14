@@ -33,7 +33,7 @@ public class NamedServiceLoader {
     /**
      * Sprawdza czy jest zarejstrowany serwis o podanej nazwie, implementujący podany interfejs.
      *
-     * @param baseClass klasa interfejsu serwisu.
+     * @param baseClass     klasa interfejsu serwisu.
      * @param requestedName sprawdzana nazwa.
      * @return <code>true</code> jeśli jest zarejstrowany serwis o podanej nazwie,
      * implementujący podany interfejs, <code>false</code> w przeciwnym przypadku.
@@ -46,12 +46,12 @@ public class NamedServiceLoader {
     /**
      * Zwraca instancje serwisu o podanej nazwie, implementujący podany interfejs.
      *
-     * @param baseClass klasa interfejsu serwisu.
+     * @param baseClass     klasa interfejsu serwisu.
      * @param requestedName nazwa serwisu.
-     * @param <T> typ interfejsu serwisu.
+     * @param <T>           typ interfejsu serwisu.
      * @return instancja serwisu o podanej nazwie, implementujący podany interfejs.
      * @throws NoSuchElementException jeśli nie istnieje serwis o podanej nazwie,
-     * implementujący podany interfejs.
+     *                                implementujący podany interfejs.
      */
     public static <T> T loadNamedService(Class<T> baseClass, String requestedName) {
         return ServiceLoader.load(baseClass, NamedServiceLoader.class.getClassLoader())
@@ -90,7 +90,7 @@ public class NamedServiceLoader {
     /**
      * Sprawdza czy dana klasa serwisu jest oznaczona podaną nazwą.
      *
-     * @param actualClass konkretna klasa serwisu.
+     * @param actualClass   konkretna klasa serwisu.
      * @param requestedName sprawdzana nazwa.
      * @return <code>true</code> jeśli dana klasa serwisu jest oznaczona podaną nazwą.
      * <code>false</code> w przeciwnym wypadku.
@@ -107,5 +107,6 @@ public class NamedServiceLoader {
      * Prywatny konstruktor żeby uniemożliwić tworzenie instancji util'a,
      * który ma wyłącznie statyczne metody.
      */
-    private NamedServiceLoader() {}
+    private NamedServiceLoader() {
+    }
 }

@@ -16,7 +16,7 @@ public class HoneycombMeshGeneratorImpl implements PointMeshGenerator {
     /**
      * Zwraca listę punktów tworzących siatkę opartą na sześciokątach foremnych (aka "plaster miodu").
      *
-     * @param distance odległość pomiędzy node'ami siatki - długość boku sześciokąta foremnego.
+     * @param distance   odległość pomiędzy node'ami siatki - długość boku sześciokąta foremnego.
      * @param sideLength długość boku kwadratowego obszaru, w którym znajdują się punkty.
      * @return lista punktów tworzących siatkę.
      */

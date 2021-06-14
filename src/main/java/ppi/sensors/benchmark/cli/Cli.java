@@ -184,6 +184,7 @@ public class Cli {
      * i wywoluje na niej metodę {@link #run()}.
      *
      * @param args argumenty z linii poleceń.
+     * @throws IOException w przypadku problemów z zapisem plików lub utworzeniem katalogu.
      */
     public static void main(String... args) throws IOException {
 
@@ -228,7 +229,7 @@ public class Cli {
      * Wyłowywany w {@link #main(String...)} po sparsowaniu przekazanych argumentów do pól obiektu {@link Cli}.
      * Odpala {@link Generator} po uprzedniej walidacji pól i setupie generatora zgodnie z argumentami commandline.
      *
-     * @throws IOException w przypadku problemów z zapisem plików lub utworzeniem katalogu.
+     * @throws IOException         w przypadku problemów z zapisem plików lub utworzeniem katalogu.
      * @throws ValidationException w przypadku gdy argumenty commandline nie spełniły kryteriów walidacyjnych.
      */
     public void run() throws IOException, ValidationException {

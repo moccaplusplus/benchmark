@@ -16,7 +16,7 @@ public class TriangleMeshGeneratorImpl implements PointMeshGenerator {
     /**
      * Zwraca listę punktów tworzących siatkę opartą na trójkątach równobocznych.
      *
-     * @param distance odległość pomiędzy node'ami siatki - długość boku trójkata równobocznego.
+     * @param distance   odległość pomiędzy node'ami siatki - długość boku trójkata równobocznego.
      * @param sideLength długość boku kwadratowego obszaru, w którym znajdują się punkty.
      * @return lista punktów tworzących siatkę.
      */

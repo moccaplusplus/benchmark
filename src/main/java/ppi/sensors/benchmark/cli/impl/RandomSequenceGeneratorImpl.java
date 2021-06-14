@@ -12,7 +12,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.generate;
 
 /**
- *  Pseudolosowy generator sekwencji punktów.
+ * Pseudolosowy generator sekwencji punktów.
  */
 @ServiceName("random")
 public class RandomSequenceGeneratorImpl implements PointSequenceGenerator {
@@ -44,7 +44,7 @@ public class RandomSequenceGeneratorImpl implements PointSequenceGenerator {
      * Zwraca sekwencję punktów o losowych współrzędnych wewnątrz kwadratowego
      * obszaru zadanego długością boku.
      *
-     * @param count liczba punktów, którą należy wygenerować (długość sekwencji).
+     * @param count      liczba punktów, którą należy wygenerować (długość sekwencji).
      * @param sideLength długość boku kwadratowego obszaru, w którym znajdują się punkty.
      * @return sekwencja punktów jako lista.
      */

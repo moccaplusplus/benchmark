@@ -13,7 +13,7 @@ import static java.util.stream.Stream.generate;
  * Generator ciągu punktów wg. ciągu Haltona.
  * Współrzędna x n-tego punktu zawiera n-tą liczbę ciągu Haltona dla bazy 2.
  * Współrzędna y n-tego punktu zawiera n-tą liczbę ciągu Haltona dla bazy 3.
- *
+ * <p>
  * Implementacja oparta na pseudokodzie z https://en.wikipedia.org/wiki/Halton_sequence.
  */
 @ServiceName("halton")
@@ -29,7 +29,7 @@ public class HaltonSequenceGeneratorImpl implements PointSequenceGenerator {
      * to n-ty wyraz ciągu Haltona o bazie 2, zaś współrzędna y to n-ty wyraz ciągu
      * Haltona o bazie 3.
      *
-     * @param count liczba punktów, którą należy wygenerować (długość sekwencji).
+     * @param count      liczba punktów, którą należy wygenerować (długość sekwencji).
      * @param sideLength długość boku kwadratowego obszaru, w którym znajdują się punkty.
      * @return sekwencja punktów jako lista.
      */

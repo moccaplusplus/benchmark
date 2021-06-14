@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Generator sekwencji punktów.
  * Używany do generowania sekwencji sensorów.
- *
+ * <p>
  * Aktualnie dostępne implementacje to:
  * {@link ppi.sensors.benchmark.cli.impl.GaussianSequenceGeneratorImpl},
  * {@link ppi.sensors.benchmark.cli.impl.HaltonSequenceGeneratorImpl},
@@ -22,7 +22,7 @@ public interface PointSequenceGenerator {
      * Zwraca sekwencje punktów zgodnie z zadanymi parametrami.
      * Algorytm generowania punktów zależny jest od klasy implementującej.
      *
-     * @param count liczba punktów, którą należy wygenerować (długość sekwencji).
+     * @param count      liczba punktów, którą należy wygenerować (długość sekwencji).
      * @param sideLength długość boku kwadratowego obszaru, w którym znajdują się punkty.
      * @return sekwencja punktów jako lista.
      */

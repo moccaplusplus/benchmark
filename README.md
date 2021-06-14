@@ -95,5 +95,14 @@ Javadoc'a generujemy komendą:
 ```
 mvnw javadoc:javadoc
 ```
-Wygenerowany javadoc znajduje się w podkatalogu `target/site` głównego folderu projektu.
-Otwieramy plik `target/site/index.html` w przeglądarce.
+Wygenerowany javadoc znajduje się w podkatalogu `target/site/apidocs` głównego folderu projektu.
+Otwieramy plik `target/site/apidocs/index.html` w przeglądarce.
+
+W Windows CommandPrompt możemy uruchomić z linii poleceń, z głównego folderu projektu:
+```
+start chrome file://%cd%/target/site/apidocs/index.html
+```
+lub:
+```
+start firefox file://%cd%/target/site/apidocs/index.html
+```
