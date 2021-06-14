@@ -76,6 +76,18 @@ java -jar target/benchmark-cli.jar --help
 
 Opcja `--help` wyświetla manual naszego programu.
 
+Przykładowe wywołanie z poprawnymi opcjami:
+```
+mkdir results
+java -jar target/benchmark-cli.jar -i=10 -d=1.0 -e=20 -m=square -s=100 -g=halton -l=25 -o=results
+```
+Najpierw utworzyliśmy katalog który potem przekazaliśmy w parametrze `-o` (`--outDir`). 
+Po uruchomieniu w katalogu `results` znajdziemy podkatalogi `poi` oraz `sensor` 
+zawierające wygenerowane pliki.
+
+Parametr `-o` (`--outDir`) jest opcjonalny - jeśli nie zostanie podany to podkatalogi 
+`poi` oraz `sensor` zostaną utworzone w bieżącym katalogu.  
+
 
 ### Uruchamianie testów
 
