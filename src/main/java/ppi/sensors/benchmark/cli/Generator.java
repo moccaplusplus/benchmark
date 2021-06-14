@@ -9,7 +9,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.Instant;
 import java.util.Random;
 
 import static java.util.stream.Collectors.toList;
@@ -232,7 +231,7 @@ public class Generator {
 
         for (var i = 1; i <= instanceCount; i++) {
             final var file = new File(outDir, i + ".json");
-            data.seed = Instant.now().toEpochMilli();
+            data.seed = System.nanoTime();
             random.setSeed(data.seed);
             data.pois = mesh.stream().filter(p -> random.nextDouble() < poiDensity).collect(toList());
             jsonMapper.writeValue(file, data);

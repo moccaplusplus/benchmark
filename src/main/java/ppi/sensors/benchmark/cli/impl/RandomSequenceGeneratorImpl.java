@@ -4,7 +4,6 @@ import ppi.sensors.benchmark.cli.PointSequenceGenerator;
 import ppi.sensors.benchmark.cli.model.Point;
 import ppi.sensors.benchmark.cli.util.ServiceName;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Random;
 
@@ -27,7 +26,7 @@ public class RandomSequenceGeneratorImpl implements PointSequenceGenerator {
      * Konstruktor z domyślnym ziarnem (current timestamp) generatora losowego.
      */
     public RandomSequenceGeneratorImpl() {
-        this(Instant.now().toEpochMilli());
+        this(System.nanoTime());
     }
 
     /**
