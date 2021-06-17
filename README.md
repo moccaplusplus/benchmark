@@ -3,18 +3,18 @@
 
 ### Wymagania
 
-- Zainstalowana JDK 11 (lub wyższa, testowane było na 11 bo to obecny LTS).
+- Zainstalowana JDK 11 (lub wyższa, testowane było na 11, bo to obecny LTS).
 - Należy pamiętać: 
   - o ustawieniu zmiennej środowiskowej `JAVA_HOME` wskazującej
   na katalog gdzie zainstalowaliśmy JDK.
   - oraz updejtowaniu zmiennej środowiskowej `PATH` tak by zawierała w sobie 
     również ścieżkę do `${JAVA_HOME}/bin`
   
-- Projekt jest budowany maven'em. Używamy maven-wrappera Proszę zwrócić uwagę że poniżej 
+- Projekt jest budowany maven'em. Używamy maven-wrappera. Proszę zwrócić uwagę, że poniżej 
   używamy komendy `mvnw` a nie `mvn`. W związku z tym instalacja lokalna mavena nie jest 
-  potrzebna - a wręcz niewskazana (ze względu na ryzyko niezgodności wersji).
+  potrzebna (lepiej użyć maven-wrappera, ze względu na ryzyko niezgodności wersji).
   
-- Połączenie internetowe - maven ściąga zadeklarowane zależności z internetu 
+- **Połączenie internetowe** - maven ściąga zadeklarowane zależności z internetu 
   podczas pierwszego builda.
 
 
@@ -38,10 +38,10 @@ Struktura katalogów wygląda tak:
 -- README.md
 ```
 
-- Źródła programu są w podkatalogoach `/src/main`
+- Źródła programu są w podkatalogoach `/src/main`.
 - Z kolei `/src/test` zawiera źródła unit testów.
 - Podkatalog `.mvn` oraz pliki `mvnw` i `mvnw.cmd` to maven-wrapper.
-- Plik `pom.xml` to deskryptor projektu i jego zaelżności dla mavena.
+- Plik `pom.xml` to deskryptor projektu i jego zależności dla mavena.
   
 
 ### Praca z maven'em
@@ -62,6 +62,10 @@ mvnw package -DskipTests
 Opcja `-DskipTests` wyłącza odpalanie testów. Oczywiście można z niej zrezygnować
 ale wtedy build będzie trwał dłużej.
 
+UWAGA: 
+Pierwszy build ściąga zależności z Internetu. Kolejne buildy będą znacznie szybsze,
+ponieważ nie będzie już ściągania zależności.
+
 
 ### Uruchamianie programu
 
@@ -81,11 +85,11 @@ Przykładowe wywołanie z poprawnymi opcjami:
 mkdir results
 java -jar target/benchmark-cli.jar -i=10 -d=1.0 -e=20 -m=square -s=100 -g=halton -l=25 -o=results
 ```
-Najpierw utworzyliśmy katalog który potem przekazaliśmy w parametrze `-o` (`--outDir`). 
+Najpierw utworzyliśmy katalog, który potem przekazaliśmy w parametrze `-o` (`--outDir`). 
 Po uruchomieniu w katalogu `results` znajdziemy podkatalogi `poi` oraz `sensor` 
 zawierające wygenerowane pliki.
 
-Parametr `-o` (`--outDir`) jest opcjonalny - jeśli nie zostanie podany to podkatalogi 
+Parametr `-o` (`--outDir`) jest opcjonalny, jeśli nie zostanie podany to podkatalogi 
 `poi` oraz `sensor` zostaną utworzone w bieżącym katalogu.  
 
 
@@ -117,4 +121,12 @@ start chrome file://%cd%/target/site/apidocs/index.html
 lub:
 ```
 start firefox file://%cd%/target/site/apidocs/index.html
+```
+
+### Czyszczenie projektu 
+
+Aby usunąć wszystkie zbudowane artefakty oraz wszystkie pliki pomocnicze utworzone w trakcie build'a uruchamiamy: 
+
+```
+mvnw clean
 ```
